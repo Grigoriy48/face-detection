@@ -1,1 +1,1 @@
-face-detection
+Face detection, Viola Jones, CUDA
