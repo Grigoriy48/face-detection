@@ -41,20 +41,21 @@ void TreatmentOnCPU::SearchSkinByYIQ() {
 			g = color.rgbGreen;
 			b = color.rgbBlue;
 
-//			int O1 = (r - g) / sqrt(2);
-//			int O2 = (r + g - 2 * b) / sqrt(6);
-//			int O3 = (r + g + b) / sqrt(3);
 
-			double I = log(g);
+
+			double I = 0.596 * r - 0.274 * g - 0.322 * b;
 			double R = log(r) - log(g);
 			double B = log(b) - (log(g) + log(r)) / 2;
 
 
-			double H = atan2(R,B);
-			int S = sqrt(sqr(R) + sqr(B));
+			double H = atan2(R,B)* (180 / 3.141592654);
+		//	int S = sqrt(sqr(R) + sqr(B));
 
-			if (!(1 <= H && H <= 2.47) && !(5.199 <= I && I <= 5.2)) {
-				FreeImage_SetPixelColor(original_image, x, y, &blackColor);				notSkinPixel++;
+
+			if (!(100 <= H && H <= 150) && !(20 <= I && I <= 90)) {
+		//	if (!(63 <= H && H <= 178) && !(7 <= I && I <= 134)) {
+				FreeImage_SetPixelColor(original_image, x, y, &blackColor);
+				notSkinPixel++;
 			}
 		}
 	}
@@ -90,7 +91,8 @@ void TreatmentOnCPU::SearchSkinByRGB() {
 //			b *= factor_for_skin;
 
 			if (!(r > 90 && g > 40 && b > 20 && r - g > 15 && r > b)) {
-				FreeImage_SetPixelColor(original_image, x, y, &blackColor);				notSkinPixel++;
+				FreeImage_SetPixelColor(original_image, x, y, &blackColor);
+				notSkinPixel++;
 			}
 		}
 	}

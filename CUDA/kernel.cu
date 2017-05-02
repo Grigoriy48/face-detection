@@ -8,6 +8,7 @@
 
 #endif
 #include "TreatmentOnCPU.h"
+#include "SkinColorDetection.h"
 
 int main()
 {
@@ -15,6 +16,21 @@ int main()
 	printf("===================== FACE DETECTION ========================\n");
 	printf("=============================================================\n\n\n");
 
-	TreatmentOnCPU *TOC = new TreatmentOnCPU();
-	TOC->Treatment();
+	
+
+	printf("=============================================================\n\n\n");
+	printf("skin color detection method:\n");
+	printf("1 - RGB\n");
+	printf("2 - Log Opponent & YIQ\n");
+	printf("3 - HSV\n");
+	printf("4 - TSL\n");
+	printf("5 - all methods\n");
+
+	int method;
+	scanf("%d", &method);
+	SkinColorDetection skinColorDetection(method);
+
+	
+	//TreatmentOnCPU *TOC = new TreatmentOnCPU();
+	//TOC->Treatment();
 }
