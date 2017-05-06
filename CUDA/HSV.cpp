@@ -66,7 +66,7 @@ double HSV::S()
 
 double HSV::V()
 {
-	double res = 0.3333333333 * (R + G + B);
+	double res = (double)1/3 * (R + G + B);
  	return res;
 }
 

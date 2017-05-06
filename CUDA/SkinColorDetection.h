@@ -10,6 +10,10 @@ class SkinColorDetection
 {
 private:
 	FIBITMAP *originalImage;
+	FIBITMAP *ImageRGB;
+	FIBITMAP *ImageLogOpponentAndYIQ;
+	FIBITMAP *ImageHSV;
+	FIBITMAP *ImageTSLAndHSV;
 	unsigned short widthOriginal;
 	unsigned short heightOriginal;
 
@@ -19,6 +23,6 @@ public:
 	void SearchSkinByRGB();
 	void SearchSkinByLogOpponentAndYIQ();
 	void SearchSkinByHSV();
-	void SearchSkinByTSL();
+	void SearchSkinByTSLAndHSV();
 };
 
