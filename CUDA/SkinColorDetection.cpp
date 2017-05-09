@@ -3,14 +3,12 @@
 
 
 
+
 SkinColorDetection::SkinColorDetection(int method)
 {
-
-
-//	unsigned int start_time = clock();
 	char *fileIn = "in.jpg";
 	char *fileOut = "out.jpg";
-//	char *haar_cascade = "haarcascade.xml";
+
 
 	originalImage = FreeImage_Load(FIF_JPEG, fileIn, 0);
 	widthOriginal = FreeImage_GetWidth(originalImage);
@@ -20,16 +18,47 @@ SkinColorDetection::SkinColorDetection(int method)
 	ImageLogOpponentAndYIQ = FreeImage_Clone(originalImage);
 	ImageHSV = FreeImage_Clone(originalImage);
 	ImageTSLAndHSV = FreeImage_Clone(originalImage);
+	FreeImage_Unload(originalImage);
 
+
+	printf("filters:\n");
+	printf("1 - file\n");
+	printf("2 - source\n");
+	int src;
+	scanf("%d", &src);
 	
-	//SearchSkinByRGB();
-
-	//	printf("Enter factor for detecter skin = ");
-	//	scanf("%f", &factor_for_skin);
-	//	SearchSkin();
-
-
-//	LoadImage(file_in);
+	switch (src)
+	{
+	case 1:
+		readFilters();
+		break;
+	case 2:
+		logOpponentMinH = 100;
+		logOpponenthsvMaxH = 150;
+		yiqMinI = 20;
+		yiqMaxI = 90;
+		//hsvMinH = 0;
+		//hsvMaxH = 50;
+		//hsvMinS = 0.20;
+		//hsvMaxS = 0.68;
+		//hsvMinV = 0.35;
+		//hsvMaxV = 1;
+		
+		hsvMinH = 0;
+		hsvMaxH = 25;
+		hsvMinS = 0.20;
+		hsvMaxS = 0.75;
+		hsvMinV = 0.35;
+		hsvMaxV = 1;
+		tslMinT = 0;
+		tslMaxT = 0.6;
+		tslMinS = 0.23;
+		tslMaxS = 0.68;
+		break;
+	}
+	//	if (!(100 <= H && H <= 150) && !(20 <= I && I <= 90)) {
+	//if (!(0.35 < V && V < 1) && !( < S && S < ) && !(0 < H && H <)) {
+	//if (!(T < 0.6) && !( < S && S < ) && !(0 < H && H < 50)) {
 
 	switch (method)
 	{
@@ -55,14 +84,6 @@ SkinColorDetection::SkinColorDetection(int method)
 	}
 
 
-
-	system("pause");
-
-
-//	printf("1 - RGB\n");
-//	printf("2 - Log Opponent & YIQ\n");
-//	printf("3 - HSV\n");
-//	printf("4 - TSL\n");
 }
 
 
@@ -90,10 +111,6 @@ void SkinColorDetection::SearchSkinByRGB() {
 			g = color.rgbGreen;
 			b = color.rgbBlue;
 
-			//			r *= factor_for_skin;
-			//			g *= factor_for_skin;
-			//			b *= factor_for_skin;
-
 			if (!(r > 90 && g > 40 && b > 20 && r - g > 15 && r > b)) {
 				FreeImage_SetPixelColor(ImageRGB, x, y, &blackColor);
 				notSkinPixel++;
@@ -102,6 +119,7 @@ void SkinColorDetection::SearchSkinByRGB() {
 	}
 
 	FreeImage_Save(FreeImage_GetFIFFromFilename(fileSkinRGB), ImageRGB, fileSkinRGB, 0);
+	FreeImage_Unload(ImageRGB);
 	printf("Save: %s\n", fileSkinRGB);
 }
 
@@ -138,9 +156,9 @@ void SkinColorDetection::SearchSkinByLogOpponentAndYIQ()
 
 			double H = logOpponent.getH();
 			double I = yiq.getI();
-
-		//	if (!(100 <= H && H <= 150) && !(20 <= I && I <= 90)) {
-			if (!(65 <= H && H <= 177) && !(9 <= I && I <= 131)) {
+			
+			
+			if (!(logOpponentMinH < H & H < logOpponenthsvMaxH) & !(yiqMinI < I & I < yiqMaxI)) {
 				FreeImage_SetPixelColor(ImageLogOpponentAndYIQ, x, y, &blackColor);
 				notSkinPixel++;
 			}
@@ -148,8 +166,9 @@ void SkinColorDetection::SearchSkinByLogOpponentAndYIQ()
 	}
 
 	FreeImage_Save(FreeImage_GetFIFFromFilename(fileSkinLogOpponentAndYIQ), ImageLogOpponentAndYIQ, fileSkinLogOpponentAndYIQ, 0);
+	FreeImage_Unload(ImageLogOpponentAndYIQ);
 	printf("Save: %s\n", fileSkinLogOpponentAndYIQ);
-	//	FreeImage_Unload(original_image);
+
 }
 
 void SkinColorDetection::SearchSkinByHSV()
@@ -182,21 +201,18 @@ void SkinColorDetection::SearchSkinByHSV()
 			double S = hsv.getS();
 			double V = hsv.getV();
 
-
-			//if (!(0.35 < V && V < 1) && !(0.20 < S && S < 0.68) && !(0 < H && H < 50)) {
-			if (!(60 < V && V < 250) && !(0.027 < S && S < 0.83) && !(0 < H && H < 1)) {
+			//if ((S >= 0.20 && S <= 0.75) && V > 0.35 && H >= 0 &&H <= 25 && I <= 90 && I >= 20)
+			//if (!(hsvMinV < V && V < hsvMaxV && hsvMinS < S && S < hsvMaxS && hsvMinH < H && H < hsvMaxH)) {
+			if (!(hsvMinV < V && V < hsvMaxV) && !(hsvMinS < S && S < hsvMaxS) && !(hsvMinH < H && H < hsvMaxH)) {
 				FreeImage_SetPixelColor(ImageHSV, x, y, &blackColor);
 				notSkinPixel++;
 			} 
-			else {
-				notSkinPixel++;
-			}
 		}
 	}
 
 	FreeImage_Save(FreeImage_GetFIFFromFilename(fileSkinHSV), ImageHSV, fileSkinHSV, 0);
+	FreeImage_Unload(ImageHSV);
 	printf("Save: %s\n", fileSkinHSV);
-	//	FreeImage_Unload(original_image);
 }
 
 void SkinColorDetection::SearchSkinByTSLAndHSV()
@@ -235,8 +251,8 @@ void SkinColorDetection::SearchSkinByTSLAndHSV()
 			double S = tsl.getS();
 			double H = hsv.getH();
 
-			//if (!(T < 0.6) && !(0.23 < S && S < 0.68) && !(0 < H && H < 50)) {
-			if (!(-0.21 < S && T < 0.23) && !(0.025 < S && S < 0.63) && !(0 < H && H < 1)) {
+
+			if (!(tslMinT < T & T < tslMaxT) & !(tslMinS < S & S < tslMaxS) & !(hsvMinH < H & H < hsvMaxH)) {
 				FreeImage_SetPixelColor(ImageTSLAndHSV, x, y, &blackColor);
 				notSkinPixel++;
 			}
@@ -244,6 +260,61 @@ void SkinColorDetection::SearchSkinByTSLAndHSV()
 	}
 
 	FreeImage_Save(FreeImage_GetFIFFromFilename(fileSkinTSLAndHSV), ImageTSLAndHSV, fileSkinTSLAndHSV, 0);
+	FreeImage_Unload(ImageTSLAndHSV);
 	printf("Save: %s\n", fileSkinTSLAndHSV);
-	//	FreeImage_Unload(original_image);
 }
+
+void SkinColorDetection::readFilters()
+{
+	ifstream fout("Filters.txt");
+	string str;
+	
+	double *arrayFilters = new double[13];
+
+	int i = 0;
+	while (getline(fout, str))
+	{                        
+		arrayFilters[i] = stod(str);
+		i++;
+	}
+
+	fout.close();
+
+	logOpponentMinH = arrayFilters[0];
+	logOpponenthsvMaxH = arrayFilters[1];
+	yiqMinI = arrayFilters[2];
+	yiqMaxI	= arrayFilters[3];
+	hsvMinH	= arrayFilters[4];
+	hsvMaxH	= arrayFilters[5];
+	hsvMinS	= arrayFilters[6];
+	hsvMaxS	= arrayFilters[7];
+	hsvMinV	= arrayFilters[8];
+	hsvMaxV	= arrayFilters[9];
+	tslMinT	= arrayFilters[10];
+	tslMaxT	= arrayFilters[11];
+	tslMinS	= arrayFilters[12];
+	tslMaxS	= arrayFilters[13];
+
+	cout << "===========LOG OPPONENT===========" << endl;
+	cout << "logOpponentMinH is: " << logOpponentMinH << endl;
+	cout << "logOpponenthsvMaxH is: " << logOpponenthsvMaxH << endl;
+
+	cout << "===========YIQ===========" << endl;
+	cout << "yiqMinI is: " << yiqMinI << endl;
+	cout << "yiqMaxI is: " << yiqMaxI << endl;
+
+	cout << "===========HSV===========" << endl;
+	cout << "hsvMinH is: " << hsvMinH << endl;
+	cout << "hsvMaxH is: " << hsvMaxH << endl;
+	cout << "hsvMinS is: " << hsvMinS << endl;
+	cout << "hsvMaxS is: " << hsvMaxS << endl;
+	cout << "hsvMinV is: " << hsvMinV << endl;
+	cout << "hsvMaxV is: " << hsvMaxV << endl;
+
+	cout << "===========TSL===========" << endl;
+	cout << "tslMinT is: " << tslMinT << endl;
+	cout << "tslMaxT is: " << tslMaxT << endl;
+	cout << "tslMinS is: " << tslMinS << endl;
+	cout << "tslMaxS is: " << tslMaxS << endl;
+}
+

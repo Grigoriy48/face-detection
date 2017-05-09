@@ -30,7 +30,10 @@ int main()
 	scanf("%d", &method);
 	SkinColorDetection skinColorDetection(method);
 
-	
+
+	system("pause");
+
+
 	//TreatmentOnCPU *TOC = new TreatmentOnCPU();
 	//TOC->Treatment();
 }
